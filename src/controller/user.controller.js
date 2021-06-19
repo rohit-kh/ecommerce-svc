@@ -1,9 +1,28 @@
 const userService = require('../services/user.service')
 const {success, error} = require('../utils/response-api')
+const storeService = require('../services/store.service')
+const storeUserService = require('../services/storeUser.service')
 
-const create = async (req, res) => {
+const createAdmin = async (req, res) => {
 	try{
-        const user = await userService.create(req)
+        const user = await userService.createAdmin(req)
+		return res.status(201).send(success(user))
+	}catch (e){
+        res.status(400).send(error(e.message))
+	}
+}
+
+const createUser = async (req, res) => {
+	try{
+		req.params['id'] = req.body.storeId
+		const store = await storeService.getOne(req);
+		if(!store){
+			throw new Error('Invalid storeId')
+		}
+        const user = await userService.createUser(req)
+		req.body.storeId = req.body.storeId
+		req.body.userId = user._id
+		await storeUserService.create(req)
 		return res.status(201).send(success(user))
 	}catch (e){
         res.status(400).send(error(e.message))
@@ -11,7 +30,6 @@ const create = async (req, res) => {
 }
 
 const getOne = async (req, res) => {
-	console.log(122)
 	try{
         const user = await userService.getOne(req)
 		return res.status(201).send(success(user))
@@ -21,7 +39,6 @@ const getOne = async (req, res) => {
 }
 
 const getMyProfile = async (req, res) => {
-	console.log(1)
 	try{
         const user = await userService.getMyProfile(req)
 		return res.status(200).send(success(user))
@@ -67,7 +84,8 @@ const updateMyProfile = async (req, res) => {
 }
 
 module.exports = {
-    create,
+    createAdmin,
+	createUser,
     getMyProfile,
     logout,
     logoutAll,

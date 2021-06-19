@@ -1,4 +1,5 @@
 module.exports.permit = (...permittedRoles) => {
+    console.log(permittedRoles)
     return (request, response, next) => {
       const { user } = request
   

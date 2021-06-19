@@ -2,12 +2,21 @@ const User = require('../models/user.model')
 const constants = require('../utils/constants')
 
 
-const create = async (req) => {
+const createAdmin = async (req) => {
     const user = new User({
         ...req.body,
         role: constants.ADMIN
     })
     user['owner'] = user._id
+    return await user.save()
+}
+
+const createUser = async (req) => {
+    const user = new User({
+        ...req.body,
+        role: constants.USER,
+        owner: req.user._id
+    })
     return await user.save()
 }
 
@@ -55,7 +64,8 @@ const login = async (req) => {
 }
 
 module.exports = {
-    create,
+    createAdmin,
+    createUser,
     getOne,
     getMyProfile,
     updateMyProfile,

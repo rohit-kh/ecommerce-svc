@@ -4,7 +4,7 @@ const {error} = require('../utils/response-api')
 
 const auth = async (req, res, next) => {
     try{
-        if(['/users/login', '/users'].includes(req._parsedUrl.pathname)){
+        if(['/users/login', '/users/admin'].includes(req._parsedUrl.pathname)){
             return next()
         }
         const token = req.header('Authorization').replace('Bearer ', '')

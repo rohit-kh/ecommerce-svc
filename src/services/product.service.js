@@ -1,4 +1,6 @@
 const Product = require('../models/product.model')
+const constants = require('../utils/constants')
+const {checkStore} = require('../services/storeUser.service')
 
 const create = async (req) => {
     const product = new Product({
@@ -13,11 +15,32 @@ const getAll = async (req) => {
 }
 
 const getAllByStoreId = async (req) => {
-    return await Product.find({ownerId: req.user._id, storeId: req.params.storeId})
+    let query
+    if(req.user.role === constants.ADMIN){
+        query = {ownerId: req.user._id, storeId: req.params.storeId}
+    }else{ 
+        await checkStore(req)
+        query = {storeId: req.params.storeId}
+    }
+
+    const product =  await Product.find(query)
+    if(!product){
+        throw new Error('Resource not found!')
+    }
+    return product
 }
 
 const getOne = async (req) => {
-    const product = await Product.findOne({_id: req.params.id, ownerId: req.user._id})
+    let query
+    if(req.user.role === constants.ADMIN){
+        query = {_id: req.params.id, ownerId: req.user._id}
+    } else {
+        await req.user.populate({
+            path: 'store'
+        }).execPopulate()
+        query = {storeId: req.user.store[0].storeId, _id: req.params.id}
+    }
+    const product = await Product.findOne(query)
     if(!product){
         throw new Error('Resource not found!')
     }
@@ -41,8 +64,7 @@ const update = async (req) => {
 		throw new Error('Invalid updates!')
 	}
 
-    const _id = req.params.id
-    const product = await Product.findOne({_id, ownerId: req.user._id})
+    const product = await getOne(req)
     
     if(!product){
         throw new Error('Resource not found!')

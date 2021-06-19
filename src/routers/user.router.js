@@ -4,7 +4,10 @@ const {permit} = require('../middleware/authorization')
 const constants = require('../utils/constants')
 const router = new express.Router()
 
-router.post('/', userController.create)
+
+router.post('/', permit(constants.ADMIN), userController.createUser)
+
+router.post('/admin', userController.createAdmin)
 
 router.get('/me', userController.getMyProfile)
 

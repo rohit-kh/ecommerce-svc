@@ -8,11 +8,11 @@ router.post('/', permit(constants.ADMIN), productController.create)
 
 router.get('/', permit(constants.ADMIN), productController.getAll)
 
-router.get('/store/:storeId', permit(constants.ADMIN), productController.getAllByStoreId)
+router.get('/store/:storeId', permit(constants.ADMIN, constants.USER), productController.getAllByStoreId)
 
-router.get('/:id', permit(constants.ADMIN), productController.getOne)
+router.get('/:id', permit(constants.ADMIN, constants.USER), productController.getOne)
 
-router.patch('/:id', permit(constants.ADMIN), productController.update)
+router.patch('/:id', permit(constants.ADMIN, constants.USER), productController.update)
 
 router.delete('/:id', permit(constants.ADMIN), productController.destroy)
 
