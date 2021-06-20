@@ -7,6 +7,9 @@ const auth = async (req, res, next) => {
         if(['/users/login', '/users/admin'].includes(req._parsedUrl.pathname)){
             return next()
         }
+        if(req.header('Authorization') === undefined){
+            throw new Error('Unauthorized')
+        }
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, process.env.JWT_KEY)
         console.log(decoded, token);
